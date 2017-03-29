@@ -144,6 +144,7 @@ private:
     QTreeView *mView;
     QDialogButtonBox *mButtons;
     QAbstractButton *mLocateButton;
+    QAbstractButton *mRemoveButton;
 };
 
 } // namespace Internal

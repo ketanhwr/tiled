@@ -20,6 +20,7 @@
 
 #include "brokenlinks.h"
 
+#include "addremovetileset.h"
 #include "changetileimagesource.h"
 #include "documentmanager.h"
 #include "map.h"
@@ -270,6 +271,8 @@ void BrokenLinksModel::tilesetAdded(int index, Tileset *tileset)
 void BrokenLinksModel::tilesetRemoved(Tileset *tileset)
 {
     disconnectFromTileset(tileset->sharedPointer());
+
+    refresh();
 }
 
 void BrokenLinksModel::tilesetReplaced(int index, Tileset *newTileset, Tileset *oldTileset)
@@ -328,6 +331,9 @@ BrokenLinksWidget::BrokenLinksWidget(BrokenLinksModel *brokenLinksModel, QWidget
     mLocateButton = mButtons->addButton(tr("Locate File..."), QDialogButtonBox::ActionRole);
     mLocateButton->setEnabled(false);
 
+    mRemoveButton = mButtons->addButton(tr("Remove"), QDialogButtonBox::ActionRole);
+    mRemoveButton->setEnabled(false);
+
     QFont font = mTitleLabel->font();
     font.setBold(true);
     mTitleLabel->setFont(font);
@@ -378,7 +384,7 @@ void BrokenLinksWidget::clicked(QAbstractButton *button)
 {
     if (button == mButtons->button(QDialogButtonBox::Ignore)) {
         mBrokenLinksModel->document()->setIgnoreBrokenLinks(true);
-    } else if (button == mLocateButton) {
+    } else {
         const auto proxySelection = mView->selectionModel()->selectedRows();
         if (proxySelection.isEmpty())
             return;
@@ -386,15 +392,26 @@ void BrokenLinksWidget::clicked(QAbstractButton *button)
         const auto firstIndex = mProxyModel->mapToSource(proxySelection.first());
         const BrokenLink &link = mBrokenLinksModel->brokenLink(firstIndex.row());
 
-        tryFixLink(link);
+        if (button == mLocateButton) {
+            tryFixLink(link);
+            // todo: support multi-selection and do something smart
+        } else if (button == mRemoveButton) {
+            Document *document = mBrokenLinksModel->document();
 
-        // todo: support multi-selection and do something smart
+            if (link.type == MapTilesetReference) {
+                MapDocument *mapDocument = static_cast<MapDocument*>(document);
+                int index = mapDocument->map()->tilesets().indexOf(link._tileset->sharedPointer());
+                if (index != -1)
+                    document->undoStack()->push(new RemoveTileset(mapDocument, index));
+            }
+        }
     }
 }
 
 void BrokenLinksWidget::selectionChanged(const QItemSelection &selected)
 {
     mLocateButton->setEnabled(!selected.isEmpty());
+    mRemoveButton->setEnabled(!selected.isEmpty());
 
     bool isTileset = qobject_cast<TilesetDocument*>(mBrokenLinksModel->document()) != nullptr;
 
