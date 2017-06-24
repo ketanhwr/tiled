@@ -104,6 +104,8 @@ MapDocumentActionHandler::MapDocumentActionHandler(QObject *parent)
     mActionRemoveLayer->setIcon(
             QIcon(QLatin1String(":/images/16x16/edit-delete.png")));
 
+    mActionLockLayer = new QAction(this);
+
     mActionSelectPreviousLayer = new QAction(this);
     mActionSelectPreviousLayer->setShortcut(tr("Ctrl+PgDown"));
 
@@ -160,6 +162,7 @@ MapDocumentActionHandler::MapDocumentActionHandler(QObject *parent)
     connect(mActionSelectPreviousLayer, &QAction::triggered, this, &MapDocumentActionHandler::selectPreviousLayer);
     connect(mActionSelectNextLayer, &QAction::triggered, this, &MapDocumentActionHandler::selectNextLayer);
     connect(mActionRemoveLayer, &QAction::triggered, this, &MapDocumentActionHandler::removeLayer);
+    connect(mActionLockLayer, &QAction::triggered, this, &MapDocumentActionHandler::lockLayer);
     connect(mActionMoveLayerUp, &QAction::triggered, this, &MapDocumentActionHandler::moveLayerUp);
     connect(mActionMoveLayerDown, &QAction::triggered, this, &MapDocumentActionHandler::moveLayerDown);
     connect(mActionToggleOtherLayers, &QAction::triggered, this, &MapDocumentActionHandler::toggleOtherLayers);
@@ -197,6 +200,7 @@ void MapDocumentActionHandler::retranslateUi()
     mActionDuplicateLayer->setText(tr("&Duplicate Layer"));
     mActionMergeLayerDown->setText(tr("&Merge Layer Down"));
     mActionRemoveLayer->setText(tr("&Remove Layer"));
+    mActionLockLayer->setText(tr("Lock Layer"));
     mActionSelectPreviousLayer->setText(tr("Select Pre&vious Layer"));
     mActionSelectNextLayer->setText(tr("Select &Next Layer"));
     mActionMoveLayerUp->setText(tr("R&aise Layer"));
@@ -600,6 +604,12 @@ void MapDocumentActionHandler::removeLayer()
         mMapDocument->removeLayer(mMapDocument->currentLayer());
 }
 
+void MapDocumentActionHandler::lockLayer()
+{
+    if (mMapDocument)
+        mMapDocument->lockLayer(mMapDocument->currentLayer());
+}
+
 void MapDocumentActionHandler::toggleOtherLayers()
 {
     if (mMapDocument)
@@ -702,6 +712,7 @@ void MapDocumentActionHandler::updateActions()
     mActionMoveLayerDown->setEnabled(canMoveLayerDown);
     mActionToggleOtherLayers->setEnabled(currentLayer && (hasNextLayer || hasPreviousLayer));
     mActionRemoveLayer->setEnabled(currentLayer);
+    mActionLockLayer->setEnabled(currentLayer);
     mActionLayerProperties->setEnabled(currentLayer);
 
     mActionDuplicateObjects->setEnabled(selectedObjectsCount > 0);

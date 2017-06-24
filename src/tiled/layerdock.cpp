@@ -324,6 +324,7 @@ void LayerView::contextMenuEvent(QContextMenuEvent *event)
         menu.addAction(handler->actionDuplicateLayer());
         menu.addAction(handler->actionMergeLayerDown());
         menu.addAction(handler->actionRemoveLayer());
+        menu.addAction(handler->actionLockLayer());
         menu.addSeparator();
         menu.addAction(handler->actionMoveLayerUp());
         menu.addAction(handler->actionMoveLayerDown());

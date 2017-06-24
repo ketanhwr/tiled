@@ -113,6 +113,8 @@ QRegion TileLayer::region(std::function<bool (const Cell &)> condition) const
 void Tiled::TileLayer::setCell(int x, int y, const Cell &cell)
 {
     Q_ASSERT(contains(x, y));
+    if (isLocked())
+        return;
 
     Cell &existingCell = mGrid[x + y * mWidth];
 
@@ -171,6 +173,8 @@ void TileLayer::merge(const QPoint &pos, const TileLayer *layer)
 void TileLayer::setCells(int x, int y, TileLayer *layer,
                          const QRegion &mask)
 {
+    if (isLocked())
+        return;
     // Determine the overlapping area
     QRegion area = QRect(x, y, layer->width(), layer->height());
     area &= QRect(0, 0, width(), height());
@@ -191,6 +195,8 @@ void TileLayer::setCells(int x, int y, TileLayer *layer,
 void TileLayer::setTiles(const QRegion &area, Tile *tile)
 {
     Q_ASSERT(area.subtracted(QRegion(0, 0, mWidth, mHeight)).isEmpty());
+    if (isLocked())
+        return;
 
     for (const QRect &rect : area.rects()) {
         for (int x = rect.left(); x <= rect.right(); ++x) {
@@ -205,6 +211,8 @@ void TileLayer::setTiles(const QRegion &area, Tile *tile)
 
 void TileLayer::erase(const QRegion &area)
 {
+    if (isLocked())
+        return;
     const Cell emptyCell;
     for (const QRect &rect : area.rects())
         for (int x = rect.left(); x <= rect.right(); ++x)
@@ -214,6 +222,8 @@ void TileLayer::erase(const QRegion &area)
 
 void TileLayer::flip(FlipDirection direction)
 {
+    if (isLocked())
+        return;
     QVector<Cell> newGrid(mWidth * mHeight);
 
     Q_ASSERT(direction == FlipHorizontally || direction == FlipVertically);
@@ -238,6 +248,8 @@ void TileLayer::flip(FlipDirection direction)
 
 void TileLayer::flipHexagonal(FlipDirection direction)
 {
+    if (isLocked())
+        return;
     QVector<Cell> newGrid(mWidth * mHeight);
 
     Q_ASSERT(direction == FlipHorizontally || direction == FlipVertically);
@@ -274,6 +286,8 @@ void TileLayer::flipHexagonal(FlipDirection direction)
 
 void TileLayer::rotate(RotateDirection direction)
 {
+    if (isLocked())
+        return;
     static const char rotateRightMask[8] = { 5, 4, 1, 0, 7, 6, 3, 2 };
     static const char rotateLeftMask[8]  = { 3, 2, 7, 6, 1, 0, 5, 4 };
 
@@ -314,6 +328,8 @@ void TileLayer::rotate(RotateDirection direction)
 
 void TileLayer::rotateHexagonal(RotateDirection direction, Map *map)
 {
+    if (isLocked())
+        return;
     Map::StaggerIndex staggerIndex = map->staggerIndex();
     Map::StaggerAxis staggerAxis = map->staggerAxis();
 
@@ -460,6 +476,8 @@ void TileLayer::replaceReferencesToTileset(Tileset *oldTileset,
 
 void TileLayer::resize(const QSize &size, const QPoint &offset)
 {
+    if (isLocked())
+        return;
     if (this->size() == size && offset.isNull())
         return;
 
@@ -486,6 +504,8 @@ void TileLayer::offsetTiles(const QPoint &offset,
                             const QRect &bounds,
                             bool wrapX, bool wrapY)
 {
+    if (isLocked())
+        return;
     QVector<Cell> newGrid(mWidth * mHeight);
 
     for (int y = 0; y < mHeight; ++y) {

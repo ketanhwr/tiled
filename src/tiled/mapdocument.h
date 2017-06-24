@@ -143,6 +143,7 @@ public:
     void moveLayerUp(Layer *layer);
     void moveLayerDown(Layer *layer);
     void removeLayer(Layer *layer);
+    void lockLayer(Layer *layer);
     void toggleOtherLayers(Layer *layer);
 
     void insertTileset(int index, const SharedTileset &tileset);

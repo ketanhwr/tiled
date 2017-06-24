@@ -591,6 +591,12 @@ void MapDocument::removeLayer(Layer *layer)
                                      layer->parentLayer()));
 }
 
+void MapDocument::lockLayer(Layer *layer)
+{
+    Q_ASSERT(layer->map() == mMap);
+    layer->setLocked(!layer->isLocked());
+}
+
 /**
   * Show or hide all other layers except the given \a layer.
   * If any other layer is visible then all layers will be hidden, otherwise

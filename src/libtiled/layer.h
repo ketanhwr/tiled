@@ -100,10 +100,14 @@ public:
 
     bool isHidden() const;
 
+    bool isLocked() const;
+
     /**
      * Sets the visibility of this layer.
      */
     void setVisible(bool visible) { mVisible = visible; }
+
+    void setLocked(bool locked) { mLocked = locked; }
 
     /**
      * Returns the map this layer is part of.
@@ -225,6 +229,7 @@ protected:
     QPointF mOffset;
     float mOpacity;
     bool mVisible;
+    bool mLocked;
     Map *mMap;
     GroupLayer *mParentLayer;
 
